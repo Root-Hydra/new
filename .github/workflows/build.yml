@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # ১ ঘণ্টার বেশি চললে অটোমেটিক বন্ধ হয়ে যাবে
+    timeout-minutes: 60 
 
     steps:
       - name: Checkout code
@@ -21,38 +23,20 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            libffi-dev \
-            git \
-            zip \
-            unzip \
-            autoconf \
-            automake \
-            libtool \
-            pkg-config \
-            zlib1g-dev \
-            libncurses5-dev \
-            libgdbm-dev \
-            libnss3-dev \
-            libssl-dev \
-            libreadline-dev \
-            libsqlite3-dev \
-            sqlite3 \
-            bzip2 \
-            libbz2-dev
+          sudo apt-get install -y build-essential libffi-dev git zip unzip autoconf automake libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libsqlite3-dev sqlite3 bzip2 libbz2-dev
 
       - name: Install Buildozer & Cython
         run: |
           pip install --upgrade pip
           pip install --upgrade Cython==0.29.33 buildozer
 
-      - name: Build APK (Automatic Yes)
+      - name: Build APK
         run: |
-          # কোনো থার্ড-পার্টি অ্যাকশন ছাড়াই সরাসরি কমান্ড
+          # 'yes' কমান্ডটি নিশ্চিত করবে যেন কোনো প্রম্পটে বিল্ড আটকে না থাকে
           yes | buildozer -v android debug
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: BDCS-WiFi-Tool
