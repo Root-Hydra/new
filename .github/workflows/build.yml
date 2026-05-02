@@ -10,28 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Get Date
-        # ক্যাশ ম্যানেজমেন্টের জন্য তারিখ সেভ করা
-        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
-      - name: Buildozer Cache
-        uses: actions/cache@v3
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          path: .buildozer
-          key: ${{ runner.os }}-buildozer-${{ env.date }}-${{ hashFiles('buildozer.spec') }}
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libffi-dev perl autoconf automake libtool pkg-config build-essential python3-dev
+          pip install --upgrade pip
+          pip install --upgrade Cython==0.29.33 buildozer
 
       - name: Build with Buildozer
-        uses: ArtemSerebriakov/buildozer-action@v1
-        with:
-          buildozer_version: master
-          # আপনার প্রজেক্টের জন্য অটোমেটিক কমান্ড রান করবে
-          command: buildozer -v android debug
-          repository_root: .
+        run: |
+          yes | buildozer -v android debug
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: BDCS-WiFi-Brute-APK
           path: bin/*.apk
