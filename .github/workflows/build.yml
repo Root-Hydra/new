@@ -1,4 +1,4 @@
-name: Build APK
+name: BDCS Build APK
 
 on:
   push:
@@ -18,19 +18,41 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libffi-dev perl autoconf automake libtool pkg-config build-essential python3-dev
-          pip install --upgrade pip
-          pip install --upgrade Cython==0.29.33 buildozer
+          sudo apt-get install -y \
+            build-essential \
+            libffi-dev \
+            git \
+            zip \
+            unzip \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses5-dev \
+            libgdbm-dev \
+            libnss3-dev \
+            libssl-dev \
+            libreadline-dev \
+            libsqlite3-dev \
+            sqlite3 \
+            bzip2 \
+            libbz2-dev
 
       - name: Build with Buildozer
-        run: |
-          yes | buildozer -v android debug
+        # সরাসরি অ্যাকশন ব্যবহার করছি যেন পাথ অটোমেটিক হ্যান্ডেল হয়
+        uses: ArtemSerebriakov/buildozer-action@v1
+        with:
+          command: buildozer -v android debug
+          buildozer_version: master
+          # 'new' রিপোজিটরির পাথ ফিক্সড করার জন্য এটি জরুরি
+          repository_root: .
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: BDCS-WiFi-Brute-APK
+          name: BDCS-WiFi-Tool
           path: bin/*.apk
