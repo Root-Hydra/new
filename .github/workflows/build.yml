@@ -42,14 +42,15 @@ jobs:
             bzip2 \
             libbz2-dev
 
-      - name: Build with Buildozer
-        # সরাসরি অ্যাকশন ব্যবহার করছি যেন পাথ অটোমেটিক হ্যান্ডেল হয়
-        uses: ArtemSerebriakov/buildozer-action@v1
-        with:
-          command: buildozer -v android debug
-          buildozer_version: master
-          # 'new' রিপোজিটরির পাথ ফিক্সড করার জন্য এটি জরুরি
-          repository_root: .
+      - name: Install Buildozer & Cython
+        run: |
+          pip install --upgrade pip
+          pip install --upgrade Cython==0.29.33 buildozer
+
+      - name: Build APK (Automatic Yes)
+        run: |
+          # কোনো থার্ড-পার্টি অ্যাকশন ছাড়াই সরাসরি কমান্ড
+          yes | buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
